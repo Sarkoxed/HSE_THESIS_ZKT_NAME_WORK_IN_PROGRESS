@@ -1,0 +1,21 @@
+[submodule "src/cores/neorv32"]
+	path = src/cores/neorv32
+	url = git@github.com:stnolting/neorv32
+[submodule "src/cores/scr1"]
+	path = src/cores/scr1
+	url = git@github.com:syntacore/scr1.git
+[submodule "src/cores/biriscv"]
+	path = src/cores/biriscv
+	url = git@github.com:YarosLove91/biriscv.git
+[submodule "src/cores/picorv32"]
+	path = src/cores/picorv32
+	url = git@github.com:YosysHQ/picorv32.git
+[submodule "src/cores/cv32e40p"]
+	path = src/cores/cv32e40p
+	url = git@github.com:openhwgroup/cv32e40p.git
+[submodule "src/deps/ghdl"]
+	path = src/deps/ghdl
+	url = git@github.com:ghdl/ghdl
+[submodule "src/deps/riscv-gnu-toolchain"]
+	path = src/deps/riscv-gnu-toolchain
+	url = git@github.com:riscv/riscv-gnu-toolchain
