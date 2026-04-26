@@ -1,5 +1,5 @@
 # PicoRV32 target
-PICORV32_HOME ?= $(TARGETS_DIR)/../../cores/picorv32
+PICORV32_HOME ?= $(TARGETS_DIR)/../cores/picorv32
 WRAPPER = $(TARGETS_DIR)/picorv32/wrapper.S
 RISCV_PREFIX ?= riscv32-unknown-elf-
 
