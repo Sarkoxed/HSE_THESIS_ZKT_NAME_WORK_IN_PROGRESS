@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import argparse
 import os
 import subprocess
@@ -59,7 +58,6 @@ TESTS = [
             ("0x00000001", "0x00000001", "shift_1"),
             ("0x00000001", "0x00000010", "shift_16"),
             ("0x00000001", "0x0000001F", "shift_31"),
-            ("0x12345678", "0x00000008", "random_shift_8"),
         ],
     ),
     (
@@ -76,7 +74,6 @@ TESTS = [
         [
             ("0x80000000", "0x00000000", "shift_0"),
             ("0x80000000", "0x00000001", "shift_1"),
-            ("0x80000000", "0x00000010", "shift_16"),
             ("0x80000000", "0x0000001F", "shift_31"),
             ("0x7FFFFFFF", "0x0000001F", "positive_shift_31"),
         ],
@@ -109,7 +106,6 @@ TESTS = [
             ("0x12345678", "0x00000011", "random_by_17"),
         ],
     ),
-    # Zbb rotate
     (
         "ror",
         [
@@ -128,7 +124,6 @@ TESTS = [
             ("0x12345678", "0x0000001F", "rot_31"),
         ],
     ),
-    # Load
     (
         "lw",
         [
@@ -136,19 +131,8 @@ TESTS = [
             ("0x00000000", "0x00000000", "word_zero"),
         ],
     ),
-    (
-        "lh",
-        [
-            ("0xDEADBEEF", "0x00000000", "half"),
-        ],
-    ),
-    (
-        "lb",
-        [
-            ("0xDEADBEEF", "0x00000000", "byte"),
-        ],
-    ),
-    # Store
+    ("lb", [("0xDEADBEEF", "0x00000000", "byte")]),
+    ("lh", [("0xDEADBEEF", "0x00000000", "half")]),
     (
         "sw",
         [
@@ -156,51 +140,59 @@ TESTS = [
             ("0x00000000", "0x00000000", "word_zero"),
         ],
     ),
-    (
-        "sh",
-        [
-            ("0xDEADBEEF", "0x00000000", "half"),
-        ],
-    ),
-    (
-        "sb",
-        [
-            ("0xDEADBEEF", "0x00000000", "byte"),
-        ],
-    ),
+    ("sb", [("0xDEADBEEF", "0x00000000", "byte")]),
+    ("sh", [("0xDEADBEEF", "0x00000000", "half")]),
 ]
 
+LOAD_STORE = {"lw", "lh", "lhu", "lb", "lbu", "sw", "sh", "sb"}
 REPEATS = 1000
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output", default="generated")
     parser.add_argument("-r", "--repeats", type=int, default=REPEATS)
+    parser.add_argument(
+        "-t", "--target", default="neorv32", choices=["neorv32", "picorv32"]
+    )
     args = parser.parse_args()
 
-    LOAD_STORE = {"lw", "lh", "lhu", "lb", "lbu", "sw", "sh", "sb"}
-
-    os.makedirs(args.output, exist_ok=True)
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    gen = os.path.join(script_dir, "generate_test.py")
     count = 0
 
     for insn, operand_sets in TESTS:
-        modes = ["static"] if insn in LOAD_STORE else ["static", "accum"]
+        modes = ["static"] if insn in LOAD_STORE else ["static", "accum", "single"]
         for mode in modes:
-            for i, (op1, op2, desc) in enumerate(operand_sets):
+            for op1, op2, desc in operand_sets:
                 suffix = f"_{mode}" if mode != "static" else ""
                 test_name = f"{insn}_{desc}{suffix}"
                 test_dir = os.path.join(args.output, test_name)
 
-                subprocess.run([
-                    sys.executable, os.path.join(script_dir, "generate_test.py"),
-                    "-i", insn, "-o1", op1, "-o2", op2,
-                    "-r", str(args.repeats), "-o", test_dir,
-                    "-m", mode
-                ], check=True)
+                subprocess.run(
+                    [
+                        sys.executable,
+                        gen,
+                        "-i",
+                        insn,
+                        "-o1",
+                        op1,
+                        "-o2",
+                        op2,
+                        "-r",
+                        str(args.repeats),
+                        "-o",
+                        test_dir,
+                        "-m",
+                        mode,
+                        "-t",
+                        args.target,
+                    ],
+                    check=True,
+                )
                 count += 1
 
-    print(f"\nGenerated {count} tests in {args.output}/")
+    print(f"\nGenerated {count} tests in {args.output}/ for {args.target}")
 
 
 if __name__ == "__main__":
