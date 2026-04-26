@@ -1,0 +1,18 @@
+=== ZKT Bench (PicoRV32) ===
+Test:      /project/tests/sw_word
+Output:    /data/picorv32/sw_word
+
+riscv32-unknown-elf-gcc -mabi=ilp32 -march=rv32i_zicsr_zifencei -nostdlib -Ttext=0x00000000 -I . -o main.elf /project/targets/picorv32/wrapper.S
+riscv32-unknown-elf-objcopy -O binary main.elf main.bin
+python3 /project/targets/../cores/picorv32/firmware/makehex.py main.bin 32768 > main.hex
+iverilog -o testbench.vvp /project/targets/../cores/picorv32/testbench.v /project/targets/../cores/picorv32/picorv32.v
+vvp -N testbench.vvp +firmware=main.hex +trace +noerror
+Finished writing testbench.trace.
+TRAP after 5047 clock cycles
+ERROR!
+/project/targets/../cores/picorv32/testbench.v:270: $finish called at 51570000 (1ps)
+Sim time: 0s
+
+=== Done ===
+Results saved to /data/picorv32/sw_word
+Total time: 0s
