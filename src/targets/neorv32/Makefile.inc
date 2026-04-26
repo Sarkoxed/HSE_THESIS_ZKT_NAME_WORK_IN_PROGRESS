@@ -1,6 +1,5 @@
 # NEORV32 target
 NEORV32_HOME ?= $(TARGETS_DIR)/../../cores/neorv32
-WRAPPER = $(TARGETS_DIR)/neorv32/wrapper.S
 RISCV_PREFIX ?= riscv32-unknown-elf-
 EFFORT = -Os
 

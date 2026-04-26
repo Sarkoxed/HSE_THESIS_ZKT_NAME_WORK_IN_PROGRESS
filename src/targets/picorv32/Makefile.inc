@@ -3,7 +3,7 @@ PICORV32_HOME ?= $(TARGETS_DIR)/../../cores/picorv32
 WRAPPER = $(TARGETS_DIR)/picorv32/wrapper.S
 RISCV_PREFIX ?= riscv32-unknown-elf-
 
-main.elf: $(WRAPPER) body.S
+main.elf: $(WRAPPER) body.inc
 	$(RISCV_PREFIX)gcc -mabi=ilp32 -march=$(MARCH) -nostdlib -Ttext=0x00000000 -I . -o $@ $(WRAPPER)
 
 main.bin: main.elf

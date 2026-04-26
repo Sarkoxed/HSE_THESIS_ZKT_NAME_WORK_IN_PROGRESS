@@ -18,12 +18,13 @@ echo "Test:       $TEST_DIR"
 echo "Output:    $OUTPUT_DIR"
 echo ""
 
-# copy test to temp build dir (keep mounted test dir clean)
+# copy test + wrapper to temp build dir
 cp -r "$TEST_DIR" "$BUILD_DIR"
+cp /project/targets/neorv32/wrapper.S "$BUILD_DIR/"
 cd "$BUILD_DIR"
 
 # build + simulate
-make NEORV32_HOME="$NEORV32_HOME" RISCV_PREFIX=riscv32-unknown-elf- clean_all sim
+make NEORV32_HOME="$NEORV32_HOME" TARGETS_DIR=/project/targets RISCV_PREFIX=riscv32-unknown-elf- clean_all sim
 echo "Sim time: ${SECONDS}s"
 
 # collect artifacts to output

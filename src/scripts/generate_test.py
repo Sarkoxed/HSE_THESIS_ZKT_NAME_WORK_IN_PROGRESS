@@ -186,7 +186,7 @@ def main():
     )
 
     os.makedirs(args.output, exist_ok=True)
-    with open(os.path.join(args.output, "body.S"), "w") as f:
+    with open(os.path.join(args.output, "body.inc"), "w") as f:
         f.write(body)
     with open(os.path.join(args.output, "Makefile"), "w") as f:
         f.write(makefile)

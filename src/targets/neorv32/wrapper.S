@@ -2,6 +2,6 @@
 .globl main
 
 main:
-    .include "body.S"
+    .include "body.inc"
     li a0, 0
     ret

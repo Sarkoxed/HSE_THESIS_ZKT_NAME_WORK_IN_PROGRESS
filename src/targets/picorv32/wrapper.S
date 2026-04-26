@@ -2,7 +2,7 @@
 .globl _start
 
 _start:
-    .include "body.S"
+    .include "body.inc"
 
     # signal test passed
     li t3, 0x20000000
