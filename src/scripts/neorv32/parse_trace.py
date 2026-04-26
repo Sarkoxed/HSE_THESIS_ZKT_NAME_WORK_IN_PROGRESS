@@ -63,11 +63,14 @@ def extract_metrics(elf_path, log_path):
         if len(measured) > 1:
             m["measure_start"] = measured[0][0]
             m["measure_end"] = measured[-1][0]
-            deltas = [measured[i+1][0] - measured[i][0] for i in range(len(measured)-1)]
+            deltas = [
+                measured[i + 1][0] - measured[i][0] for i in range(len(measured) - 1)
+            ]
             m["cycles_measure"] = sum(deltas)
             m["cycles_per_insn"] = round(m["cycles_measure"] / len(deltas), 4)
 
             from collections import Counter
+
             counts = Counter(deltas)
             mode_delta, mode_count = counts.most_common(1)[0]
             m["cycles_mode"] = mode_delta
