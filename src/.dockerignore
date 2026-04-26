@@ -1,0 +1,12 @@
+deps/
+cores/
+data/
+tests/
+tests_old/
+scripts/
+*.o
+*.elf
+*.bin
+*.hex
+*.vvp
+*.vcd

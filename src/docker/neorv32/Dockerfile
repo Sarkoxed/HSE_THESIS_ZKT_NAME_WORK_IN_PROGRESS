@@ -1,41 +1,22 @@
-FROM ubuntu:24.04 as builder
+FROM zkt-toolchain as toolchain
+
+FROM ubuntu:24.04 as ghdl-builder
 
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
-        autoconf \
-        automake \
         git \
-        curl \
-        texinfo \
-        bison \
-        flex \
-        gawk \
-        libgmp-dev \
-        libmpfr-dev \
-        libmpc-dev \
-        zlib1g-dev \
-        libexpat1-dev \
         gnat \
         llvm-dev \
-        clang && \
-    apt-get -y autoremove && \
+        clang \
+        zlib1g-dev && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /project/deps
-RUN git clone https://github.com/riscv/riscv-gnu-toolchain.git
+WORKDIR /build
 RUN git clone https://github.com/ghdl/ghdl.git
-
-WORKDIR /project/deps/riscv-gnu-toolchain
-RUN ./configure --prefix=/opt/riscv --with-arch=rv32i --with-abi=ilp32
-RUN make -j25
-RUN make install
-
-WORKDIR /project/deps/ghdl
-RUN mkdir build && \
-    cd build && \ 
-    ../configure --with-llvm-config=llvm-config --prefix=/opt/ghdl && \
+WORKDIR /build/ghdl/build
+RUN ../configure --with-llvm-config=llvm-config --prefix=/opt/ghdl && \
     make -j25 && \
     make install
 
@@ -46,35 +27,26 @@ RUN apt-get update && \
     apt-get install -y \
         make \
         python3 \
+        gcc \
+        git \
         llvm \
-        git && \
-    apt-get -y autoremove && \
+        libgnat-13 \
+        zlib1g-dev \
+        libmpc-dev \
+        libmpfr-dev \
+        libgmp-dev && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /opt/riscv /opt/riscv
-COPY --from=builder /opt/ghdl /opt/ghdl
-
-WORKDIR /project/cores
-RUN git clone https://github.com/stnolting/neorv32.git
+COPY --from=toolchain /opt/riscv /opt/riscv
+COPY --from=ghdl-builder /opt/ghdl /opt/ghdl
 
 ENV PATH="/opt/riscv/bin:/opt/ghdl/bin:${PATH}"
 ENV RISCV_PREFIX=riscv32-unknown-elf-
 
-# refactor later
-
-RUN apt-get update && \
-    apt-get install -y \
-        make \
-        python3 \
-        llvm \
-        libmpc-dev \
-        libmpfr-dev \
-        libgmp-dev \
-        gcc
-
-RUN apt-get install libgnat-13 zlib1g-dev
-
 WORKDIR /project
-COPY ./entrypoint.sh ./entrypoint.sh
+RUN git clone https://github.com/stnolting/neorv32.git cores/neorv32
+COPY targets/neorv32 /project/targets/neorv32
+
+COPY docker/neorv32/entrypoint.sh /project/entrypoint.sh
 ENTRYPOINT ["/project/entrypoint.sh"]
